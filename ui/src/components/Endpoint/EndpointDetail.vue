@@ -12,7 +12,7 @@ import CodeSnippet from '@/components/CodeSnippet.vue'
 const props = defineProps<{ endpoint: Endpoint }>()
 
 const store = useEndpointStore()
-const { load: loadSaved, save: saveToStorage } = useRequestStorage()
+const { load: loadSaved, save: saveToStorage, saveResponse: saveResponseToStorage, mergeBody } = useRequestStorage()
 
 const visibility = computed(() => store.config?.visibility ?? { meta_data: true, sql_data: true, logs_data: true, models_data: true })
 
@@ -21,18 +21,49 @@ const customHeaders = ref<HeaderItem[]>([{ key: '', value: '' }])
 const customBody = ref<Record<string, unknown>>({})
 const requestPanelRef = ref<InstanceType<typeof RequestPanel> | null>(null)
 
+const {
+  loading: requestLoading,
+  responseData,
+  responseStatus,
+  responseHeaders,
+  responseTime,
+  metrics,
+  error: requestError,
+  sendRequest,
+  reset: resetApi,
+} = useApi()
+
 // Restore from localStorage on mount
 onMounted(() => {
+  restoreState()
+})
+
+function restoreState() {
   const saved = loadSaved(props.endpoint.http_method, props.endpoint.uri)
   if (saved) {
     if (saved.body && Object.keys(saved.body).length > 0) {
-      customBody.value = saved.body
+      // Smart merge: keep saved values, add new fields, remove deleted fields
+      const defaults = initialBody.value
+      if (Object.keys(defaults).length > 0) {
+        customBody.value = mergeBody(saved.body, defaults)
+      } else {
+        customBody.value = saved.body
+      }
     }
     if (saved.headers && saved.headers.length > 0) {
       customHeaders.value = [...saved.headers, { key: '', value: '' }]
     }
+    // Restore last response
+    if (saved.response) {
+      responseData.value = saved.response.data
+      responseStatus.value = saved.response.status
+      responseHeaders.value = saved.response.headers
+      responseTime.value = saved.response.time
+      metrics.value = saved.response.metrics
+      requestError.value = saved.response.error
+    }
   }
-})
+}
 
 // Auto-save body changes (debounced)
 let saveTimer: ReturnType<typeof setTimeout> | null = null
@@ -46,19 +77,28 @@ function scheduleSave() {
 watch(customBody, scheduleSave, { deep: true })
 watch(customHeaders, scheduleSave, { deep: true })
 
-const {
-  loading: requestLoading,
-  responseData,
-  responseStatus,
-  responseHeaders,
-  responseTime,
-  metrics,
-  error: requestError,
-  sendRequest,
-  reset: _reset,
-} = useApi()
+// Save response whenever it changes
+watch([responseData, responseStatus], () => {
+  if (responseStatus.value !== null) {
+    saveResponseToStorage(props.endpoint.http_method, props.endpoint.uri, {
+      data: responseData.value,
+      status: responseStatus.value,
+      headers: responseHeaders.value,
+      time: responseTime.value,
+      metrics: metrics.value,
+      error: requestError.value,
+    })
+  }
+})
 
-void _reset // suppress unused warning
+// Reset all state when endpoint changes
+watch(() => props.endpoint.uri + props.endpoint.http_method, () => {
+  resetApi()
+  activeTab.value = 'request'
+  customBody.value = { ...initialBody.value }
+  customHeaders.value = [{ key: '', value: '' }]
+  restoreState()
+})
 
 // Initialize body from rules (LRD-style: nested key support, skip file fields)
 const initialBody = computed(() => {

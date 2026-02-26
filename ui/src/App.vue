@@ -60,7 +60,7 @@ onMounted(async () => {
         </div>
 
         <!-- Endpoint Detail -->
-        <EndpointDetail v-else-if="store.selectedEndpoint" :endpoint="store.selectedEndpoint" />
+        <EndpointDetail v-else-if="store.selectedEndpoint" :endpoint="store.selectedEndpoint" :key="store.selectedEndpoint.http_method + ':' + store.selectedEndpoint.uri" />
 
         <!-- Empty State -->
         <EmptyState v-else :total="store.stats.total" />
