@@ -5,6 +5,7 @@ namespace ApiLens;
 use ApiLens\Commands\ExportCommand;
 use ApiLens\Commands\InstallCommand;
 use ApiLens\Controllers\ApiLensController;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +21,9 @@ class ApiLensServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Register middleware globally so it can intercept API requests from the UI
+        $this->registerMiddleware();
+
         // Publish config
         $this->publishes([
             __DIR__ . '/../config/api-lens.php' => config_path('api-lens.php'),
@@ -68,5 +72,32 @@ class ApiLensServiceProvider extends ServiceProvider
                 ->where('file', '.*')
                 ->name('api-lens.assets');
         });
+    }
+
+    /**
+     * Register the ApiLensMiddleware as a global middleware.
+     * This ensures it intercepts API requests made from the API Lens UI.
+     * The middleware itself checks for the X-Api-Lens header and only activates
+     * for requests coming from the API Lens interface.
+     */
+    private function registerMiddleware(): void
+    {
+        if (!config('api-lens.enabled')) {
+            return;
+        }
+
+        // Laravel 11+ uses the Application to manage middleware
+        if (method_exists($this->app, 'middleware')) {
+            $this->app->middleware([ApiLensMiddleware::class]);
+            return;
+        }
+
+        // Laravel 10.x uses the Kernel
+        /** @var \Illuminate\Foundation\Http\Kernel $kernel */
+        $kernel = $this->app->make(Kernel::class);
+
+        if (method_exists($kernel, 'pushMiddleware')) {
+            $kernel->pushMiddleware(ApiLensMiddleware::class);
+        }
     }
 }
