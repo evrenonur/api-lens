@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.1](https://github.com/evrenonur/api-lens/compare/v1.3.0...v1.3.1) (2026-02-26)
+
+### 🐛 Bug Fixes
+
+* auto-register ApiLensMiddleware as global middleware ([19c4d35](https://github.com/evrenonur/api-lens/commit/19c4d355524d82ba6230ec3edaab4185d8d00fdf))
+
 ## [1.3.0](https://github.com/evrenonur/api-lens/compare/v1.2.3...v1.3.0) (2026-02-26)
 
 ### 🚀 New Features
