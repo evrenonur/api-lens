@@ -1,5 +1,13 @@
 # API Lens
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/evrenonur/api-lens?style=flat-square)](https://packagist.org/packages/evrenonur/api-lens)
+[![Total Downloads](https://img.shields.io/packagist/dt/evrenonur/api-lens?style=flat-square)](https://packagist.org/packages/evrenonur/api-lens)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+[![PHP Version](https://img.shields.io/packagist/php-v/evrenonur/api-lens?style=flat-square)](https://packagist.org/packages/evrenonur/api-lens)
+[![Laravel](https://img.shields.io/badge/Laravel-10.x%20|%2011.x%20|%2012.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org)
+[![GitHub Stars](https://img.shields.io/github/stars/evrenonur/api-lens?style=social)](https://github.com/evrenonur/api-lens)
+
 **Auto-generated, interactive API documentation for Laravel.**
 
 Zero config. Real-time testing. Modern Vue 3 UI. OpenAPI export.
