@@ -233,8 +233,8 @@ class ApiLensController extends Controller
         $path = explode('/', $request->path());
         $fileName = end($path);
 
-        $basePath = base_path('vendor/api-lens/api-lens/resources/dist/assets/');
-        $filePath = $basePath . $fileName;
+        $basePath = realpath(__DIR__ . '/../../resources/dist/assets/');
+        $filePath = $basePath . DIRECTORY_SEPARATOR . $fileName;
 
         if (!file_exists($filePath)) {
             return response()->json(['error' => 'File not found'], 404);
