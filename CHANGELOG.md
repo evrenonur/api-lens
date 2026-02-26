@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.1](https://github.com/evrenonur/api-lens/compare/v1.2.0...v1.2.1) (2026-02-26)
+
+### ♻️ Refactoring
+
+* rename package from api-lens/api-lens to evrenonur/api-lens ([4a41347](https://github.com/evrenonur/api-lens/commit/4a41347a254bd0098b3a1e63fb81bae407c6b649))
+
 ## [1.2.0](https://github.com/evrenonur/api-lens/compare/v1.1.2...v1.2.0) (2026-02-26)
 
 ### 🚀 New Features
