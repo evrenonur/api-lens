@@ -231,7 +231,7 @@ onMounted(() => {
           View Release
         </a>
         <code class="hidden md:inline text-[11px] bg-white/10 px-2 py-0.5 rounded font-mono">
-          composer update api-lens/api-lens
+          composer update evrenonur/api-lens
         </code>
         <button
           @click="dismissUpdate"

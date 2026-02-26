@@ -233,7 +233,7 @@ class ApiLensController extends Controller
 
         try {
             $response = file_get_contents(
-                'https://repo.packagist.org/p2/api-lens/api-lens.json',
+                'https://repo.packagist.org/p2/evrenonur/api-lens.json',
                 false,
                 stream_context_create([
                     'http' => [
@@ -253,7 +253,7 @@ class ApiLensController extends Controller
             }
 
             $data = json_decode($response, true);
-            $packages = $data['packages']['api-lens/api-lens'] ?? [];
+            $packages = $data['packages']['evrenonur/api-lens'] ?? [];
 
             // Find latest stable version
             $latestVersion = $currentVersion;

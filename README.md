@@ -34,7 +34,7 @@ Zero config. Real-time testing. Modern Vue 3 UI. OpenAPI export.
 ## Installation
 
 ```bash
-composer require api-lens/api-lens --dev
+composer require evrenonur/api-lens --dev
 ```
 
 Publish the config (optional):
