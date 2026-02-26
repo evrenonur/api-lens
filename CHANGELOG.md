@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.3](https://github.com/evrenonur/api-lens/compare/v1.2.2...v1.2.3) (2026-02-26)
+
+### 📝 Documentation
+
+* add shields.io badges to README ([9145c25](https://github.com/evrenonur/api-lens/commit/9145c258af1b2ebfa2edde9b9c5aa0200ca9f484))
+
 ## [1.2.2](https://github.com/evrenonur/api-lens/compare/v1.2.1...v1.2.2) (2026-02-26)
 
 ### 📝 Documentation
