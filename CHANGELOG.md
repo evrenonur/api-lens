@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0](https://github.com/evrenonur/api-lens/compare/v1.2.3...v1.3.0) (2026-02-26)
+
+### 🚀 New Features
+
+* implement hide_meta_data, hide_sql_data, hide_logs_data, hide_models_data config visibility on frontend ([c91b13f](https://github.com/evrenonur/api-lens/commit/c91b13fb49b23115e64c21dfcbbdada04e1346a0))
+
 ## [1.2.3](https://github.com/evrenonur/api-lens/compare/v1.2.2...v1.2.3) (2026-02-26)
 
 ### 📝 Documentation
