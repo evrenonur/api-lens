@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { ApiLensMetrics } from '@/types'
+import { useEndpointStore } from '@/stores/endpoints'
 import hljs from 'highlight.js/lib/core'
 import json from 'highlight.js/lib/languages/json'
 
 hljs.registerLanguage('json', json)
+
+const store = useEndpointStore()
 
 const props = defineProps<{
   data: unknown
@@ -14,6 +17,18 @@ const props = defineProps<{
   metrics: ApiLensMetrics | null
   error: string | null
 }>()
+
+const visibility = computed(() => store.config?.visibility ?? { meta_data: true, sql_data: true, logs_data: true, models_data: true })
+
+const hasAnyMetrics = computed(() => {
+  return visibility.value.sql_data || visibility.value.logs_data || visibility.value.models_data
+})
+
+const availableTabs = computed(() => {
+  const tabs = ['body', 'headers']
+  if (hasAnyMetrics.value) tabs.push('metrics')
+  return tabs
+})
 
 const activeSubTab = ref<'body' | 'headers' | 'metrics'>('body')
 
@@ -94,7 +109,7 @@ function copyResponse() {
       <!-- Sub-tabs -->
       <div class="flex gap-1 mb-4">
         <button
-          v-for="tab in ['body', 'headers', 'metrics']"
+          v-for="tab in availableTabs"
           :key="tab"
           @click="activeSubTab = tab as any"
           :class="[
@@ -126,11 +141,11 @@ function copyResponse() {
       <div v-if="activeSubTab === 'metrics' && metrics" class="space-y-4">
         <!-- Summary -->
         <div class="grid grid-cols-4 gap-4">
-          <div class="card p-4 text-center">
+          <div v-if="visibility.sql_data" class="card p-4 text-center">
             <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ metrics.queries_count }}</div>
             <div class="text-xs text-gray-500 mt-1">SQL Queries</div>
           </div>
-          <div class="card p-4 text-center">
+          <div v-if="visibility.sql_data" class="card p-4 text-center">
             <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ metrics.queries_time_ms }}ms</div>
             <div class="text-xs text-gray-500 mt-1">Query Time</div>
           </div>
@@ -145,7 +160,7 @@ function copyResponse() {
         </div>
 
         <!-- SQL Queries -->
-        <div v-if="metrics.queries?.length" class="card overflow-hidden">
+        <div v-if="visibility.sql_data && metrics.queries?.length" class="card overflow-hidden">
           <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
             <h4 class="text-xs font-semibold text-gray-500 uppercase">SQL Queries</h4>
           </div>
@@ -155,6 +170,56 @@ function copyResponse() {
               <div class="flex items-center gap-3 mt-1.5 text-[10px] text-gray-400">
                 <span>{{ query.time }}ms</span>
                 <span>{{ query.connection_name }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logs -->
+        <div v-if="visibility.logs_data && metrics.logs?.length" class="card overflow-hidden">
+          <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase">Logs</h4>
+          </div>
+          <div class="divide-y divide-gray-100 dark:divide-gray-800">
+            <div v-for="(log, i) in metrics.logs" :key="i" class="px-4 py-3">
+              <code class="text-xs font-mono text-gray-800 dark:text-gray-200 block whitespace-pre-wrap">{{ typeof log === 'object' ? JSON.stringify(log, null, 2) : log }}</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Events -->
+        <div v-if="visibility.models_data && metrics.models_timeline?.length" class="card overflow-hidden">
+          <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase">Model Events</h4>
+          </div>
+          <div class="divide-y divide-gray-100 dark:divide-gray-800">
+            <div v-for="(ev, i) in metrics.models_timeline" :key="i" class="px-4 py-3 flex items-center gap-3">
+              <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full"
+                :class="{
+                  'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': ev.event === 'created',
+                  'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': ev.event === 'retrieved',
+                  'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': ev.event === 'updated',
+                  'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': ev.event === 'deleted',
+                }">
+                {{ ev.event }}
+              </span>
+              <code class="text-xs font-mono text-gray-800 dark:text-gray-200">{{ ev.model }}</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Summary -->
+        <div v-if="visibility.models_data && Object.keys(metrics.models || {}).length" class="card overflow-hidden">
+          <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase">Model Summary</h4>
+          </div>
+          <div class="divide-y divide-gray-100 dark:divide-gray-800">
+            <div v-for="(events, model) in metrics.models" :key="model" class="px-4 py-3">
+              <code class="text-xs font-mono text-gray-800 dark:text-gray-200 font-bold">{{ model }}</code>
+              <div class="flex gap-3 mt-1">
+                <span v-for="(count, event) in events" :key="event" class="text-[10px] text-gray-400">
+                  {{ event }}: {{ count }}
+                </span>
               </div>
             </div>
           </div>

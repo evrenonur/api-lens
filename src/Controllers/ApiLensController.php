@@ -93,6 +93,12 @@ class ApiLensController extends Controller
                 'rate_limit_info'     => true,
                 'auth_detection'      => true,
             ],
+            'visibility'      => [
+                'meta_data'   => !config('api-lens.hide_meta_data', false),
+                'sql_data'    => !config('api-lens.hide_sql_data', false),
+                'logs_data'   => !config('api-lens.hide_logs_data', false),
+                'models_data' => !config('api-lens.hide_models_data', false),
+            ],
         ]);
     }
 

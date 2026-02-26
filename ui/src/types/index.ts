@@ -46,6 +46,14 @@ export interface ApiLensConfig {
   default_headers: HeaderItem[]
   code_snippets: string[]
   features: FeatureFlags
+  visibility: VisibilityFlags
+}
+
+export interface VisibilityFlags {
+  meta_data: boolean
+  sql_data: boolean
+  logs_data: boolean
+  models_data: boolean
 }
 
 export interface UpdateInfo {

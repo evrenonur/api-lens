@@ -4,13 +4,17 @@ import type { Endpoint, HeaderItem } from '@/types'
 import { METHOD_BADGE_COLORS } from '@/types'
 import { useApi } from '@/composables/useApi'
 import { useRequestStorage } from '@/composables/useRequestStorage'
+import { useEndpointStore } from '@/stores/endpoints'
 import RequestPanel from './RequestPanel.vue'
 import ResponsePanel from './ResponsePanel.vue'
 import CodeSnippet from '@/components/CodeSnippet.vue'
 
 const props = defineProps<{ endpoint: Endpoint }>()
 
+const store = useEndpointStore()
 const { load: loadSaved, save: saveToStorage } = useRequestStorage()
+
+const visibility = computed(() => store.config?.visibility ?? { meta_data: true, sql_data: true, logs_data: true, models_data: true })
 
 const activeTab = ref<'request' | 'response' | 'snippets' | 'schema'>('request')
 const customHeaders = ref<HeaderItem[]>([{ key: '', value: '' }])
@@ -184,7 +188,7 @@ const statusColorClass = computed(() => {
       </p>
 
       <!-- Meta info -->
-      <div class="flex flex-wrap items-center gap-4 mt-3 text-xs text-gray-400 dark:text-gray-600">
+      <div v-if="visibility.meta_data" class="flex flex-wrap items-center gap-4 mt-3 text-xs text-gray-400 dark:text-gray-600">
         <span v-if="endpoint.controller" class="font-mono">
           {{ endpoint.controller }}@{{ endpoint.method }}
         </span>
@@ -205,7 +209,7 @@ const statusColorClass = computed(() => {
           {{ responseStatus }}
         </span>
         <span class="text-gray-400">{{ responseTime }}ms</span>
-        <span v-if="metrics" class="text-gray-400">
+        <span v-if="metrics && visibility.sql_data" class="text-gray-400">
           {{ metrics.queries_count }} queries ({{ metrics.queries_time_ms }}ms) · {{ metrics.memory }}
         </span>
       </div>
