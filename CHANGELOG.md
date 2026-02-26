@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.2](https://github.com/evrenonur/api-lens/compare/v1.2.1...v1.2.2) (2026-02-26)
+
+### 📝 Documentation
+
+* add screenshots to README ([791973c](https://github.com/evrenonur/api-lens/commit/791973c7703967c151e221401ff173775d05eebe))
+
 ## [1.2.1](https://github.com/evrenonur/api-lens/compare/v1.2.0...v1.2.1) (2026-02-26)
 
 ### ♻️ Refactoring
