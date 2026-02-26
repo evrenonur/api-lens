@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1](https://github.com/evrenonur/api-lens/compare/v1.1.0...v1.1.1) (2026-02-26)
+
+### 🐛 Bug Fixes
+
+* serve assets via route instead of public path for zero-config install ([dcfcd0d](https://github.com/evrenonur/api-lens/commit/dcfcd0d84d66e5f1df57dd0f22822998e68ea597))
+
 ## [1.1.0](https://github.com/evrenonur/api-lens/compare/v1.0.0...v1.1.0) (2026-02-26)
 
 ### 🚀 New Features
