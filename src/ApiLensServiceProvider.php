@@ -61,6 +61,8 @@ class ApiLensServiceProvider extends ServiceProvider
             Route::get('/', [ApiLensController::class, 'index'])->name('api-lens.index');
             Route::get('/api', [ApiLensController::class, 'api'])->name('api-lens.api');
             Route::get('/config', [ApiLensController::class, 'config'])->name('api-lens.config');
+            Route::get('/export/openapi', [ApiLensController::class, 'exportOpenApi'])->name('api-lens.export.openapi');
+            Route::get('/export/postman', [ApiLensController::class, 'exportPostman'])->name('api-lens.export.postman');
             Route::get('/assets/{file}', [ApiLensController::class, 'assets'])
                 ->where('file', '.*')
                 ->name('api-lens.assets');

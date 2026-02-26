@@ -96,6 +96,134 @@ class ApiLensController extends Controller
     }
 
     /**
+     * Export API documentation as OpenAPI 3.1.0 JSON.
+     */
+    public function exportOpenApi(Request $request): JsonResponse
+    {
+        $endpoints = $this->getProcessedEndpoints($request);
+
+        return response()->json(
+            $this->openApi->openApi($endpoints->all())->toArray(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/json; charset=utf-8',
+                'Content-Disposition' => $request->has('download')
+                    ? 'attachment; filename="openapi.json"'
+                    : 'inline',
+            ],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+        );
+    }
+
+    /**
+     * Export API documentation as Postman Collection v2.1.
+     */
+    public function exportPostman(Request $request): JsonResponse
+    {
+        $endpoints = $this->getProcessedEndpoints($request);
+        $collection = $this->toPostmanCollection($endpoints);
+
+        return response()->json(
+            $collection,
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/json; charset=utf-8',
+                'Content-Disposition' => $request->has('download')
+                    ? 'attachment; filename="postman_collection.json"'
+                    : 'inline',
+            ],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+        );
+    }
+
+    /**
+     * Get processed endpoints (extracted, split, sorted, grouped).
+     */
+    private function getProcessedEndpoints(Request $request)
+    {
+        $endpoints = $this->apiLens->getEndpoints();
+        $endpoints = $this->apiLens->splitByMethods($endpoints);
+        $endpoints = $this->apiLens->sortEndpoints($endpoints, $request->input('sort'));
+        $endpoints = $this->apiLens->groupEndpoints($endpoints, $request->input('groupby'));
+
+        return $endpoints;
+    }
+
+    /**
+     * Convert endpoints to Postman Collection v2.1 format.
+     */
+    private function toPostmanCollection($endpoints): array
+    {
+        $collection = [
+            'info' => [
+                'name'        => config('api-lens.open_api.title', config('api-lens.title', 'API Documentation')),
+                '_postman_id' => bin2hex(random_bytes(16)),
+                'description' => config('api-lens.open_api.description', ''),
+                'schema'      => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
+            ],
+            'item' => [],
+        ];
+
+        $groups = [];
+
+        foreach ($endpoints as $endpoint) {
+            $group = $endpoint->getGroup() ?: 'General';
+
+            if (!isset($groups[$group])) {
+                $groups[$group] = [
+                    'name' => $group,
+                    'item' => [],
+                ];
+            }
+
+            $baseUrl = config('api-lens.open_api.server_url', config('app.url', 'http://localhost'));
+            $url = rtrim($baseUrl, '/') . '/' . ltrim($endpoint->getUri(), '/');
+
+            $item = [
+                'name' => strtoupper($endpoint->getHttpMethod()) . ' ' . $endpoint->getUri(),
+                'request' => [
+                    'method' => strtoupper($endpoint->getHttpMethod()),
+                    'header' => [
+                        ['key' => 'Accept', 'value' => 'application/json'],
+                        ['key' => 'Content-Type', 'value' => 'application/json'],
+                    ],
+                    'url' => [
+                        'raw'  => $url,
+                        'host' => [parse_url($baseUrl, PHP_URL_HOST)],
+                        'path' => array_filter(explode('/', $endpoint->getUri())),
+                    ],
+                ],
+            ];
+
+            if ($endpoint->getDocBlock()) {
+                $item['request']['description'] = $endpoint->getDocBlock();
+            }
+
+            $httpMethod = strtoupper($endpoint->getHttpMethod());
+            if (in_array($httpMethod, ['POST', 'PUT', 'PATCH']) && !empty($endpoint->getRules())) {
+                $body = [];
+                foreach ($endpoint->getRules() as $field => $rules) {
+                    $body[$field] = '';
+                }
+
+                $item['request']['body'] = [
+                    'mode' => 'raw',
+                    'raw'  => json_encode($body, JSON_PRETTY_PRINT),
+                    'options' => [
+                        'raw' => ['language' => 'json'],
+                    ],
+                ];
+            }
+
+            $groups[$group]['item'][] = $item;
+        }
+
+        $collection['item'] = array_values($groups);
+
+        return $collection;
+    }
+
+    /**
      * Serve static assets (JS, CSS, fonts, images).
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|JsonResponse

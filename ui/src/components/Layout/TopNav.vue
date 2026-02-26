@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useEndpointStore } from '@/stores/endpoints'
 import type { ThemeMode } from '@/types'
 
@@ -11,6 +12,20 @@ const emit = defineEmits<{
 }>()
 
 const store = useEndpointStore()
+
+const exportOpen = ref(false)
+
+function closeExport() {
+  exportOpen.value = false
+}
+
+function exportAs(format: 'openapi' | 'postman') {
+  // apiUrl is like '/api-lens/api', we need '/api-lens'
+  const apiUrl = window.__API_LENS_CONFIG__?.apiUrl || '/api-lens/api'
+  const baseUrl = apiUrl.replace(/\/api$/, '')
+  window.open(`${baseUrl}/export/${format}`, '_blank')
+  exportOpen.value = false
+}
 </script>
 
 <template>
@@ -57,6 +72,79 @@ const store = useEndpointStore()
         >
           {{ method }}
         </button>
+      </div>
+
+      <!-- Export Dropdown -->
+      <div class="relative">
+        <button
+          @click="exportOpen = !exportOpen"
+          class="btn-ghost p-2 rounded-lg flex items-center gap-1.5"
+          title="Export API Documentation"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="hidden sm:inline text-xs font-medium">Export</span>
+          <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <Transition
+          enter-active-class="transition ease-out duration-100"
+          enter-from-class="transform opacity-0 scale-95"
+          enter-to-class="transform opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-75"
+          leave-from-class="transform opacity-100 scale-100"
+          leave-to-class="transform opacity-0 scale-95"
+        >
+          <div
+            v-if="exportOpen"
+            class="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-gray-900 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 z-50 overflow-hidden"
+          >
+            <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-800">
+              <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Export Documentation</p>
+            </div>
+
+            <div class="p-1.5">
+              <!-- OpenAPI -->
+              <button
+                @click="exportAs('openapi')"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
+              >
+                <div class="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div class="text-left">
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">OpenAPI 3.0</p>
+                  <p class="text-[11px] text-gray-400">Swagger UI, Redoc, Stoplight</p>
+                </div>
+              </button>
+
+              <!-- Postman -->
+              <button
+                @click="exportAs('postman')"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
+              >
+                <div class="w-9 h-9 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <div class="text-left">
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Postman Collection</p>
+                  <p class="text-[11px] text-gray-400">Import directly into Postman</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </Transition>
+
+        <!-- Click outside overlay -->
+        <div v-if="exportOpen" class="fixed inset-0 z-40" @click="closeExport" />
       </div>
 
       <!-- Theme Toggle -->

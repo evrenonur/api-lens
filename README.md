@@ -103,33 +103,55 @@ Add annotations to your controller methods for richer documentation:
 
 ```php
 /**
- * List all users
- *
- * Returns a paginated list of users with optional filtering.
- *
  * @api-lens-group Users
- * @api-lens-auth bearer
- * @api-lens-tag admin
- * @api-lens-response 200 Paginated user list
- * @api-lens-response 403 Unauthorized
  */
-public function index(Request $request)
+class UserController extends Controller
 {
-    // ...
-}
+    /**
+     * List all users.
+     *
+     * Returns a paginated list of users with optional filtering.
+     *
+     * @api-lens-auth bearer
+     * @api-lens-tag admin
+     * @api-lens-response 200 {"data": [{"id": 1, "name": "John"}], "meta": {"total": 50}}
+     */
+    public function index(Request $request)
+    {
+        // ...
+    }
 
-/**
- * Create a new user
- *
- * @deprecated since v2.0 — Use POST /api/v2/users instead
- * @api-lens-group Users
- * @api-lens-auth bearer
- */
-public function store(StoreUserRequest $request)
-{
-    // ...
+    /**
+     * Create a new user.
+     *
+     * @api-lens-response 201 {"data": {"id": 1, "name": "John"}, "message": "User created"}
+     */
+    public function store(StoreUserRequest $request)
+    {
+        // ...
+    }
+
+    /**
+     * Delete user.
+     *
+     * @api-lens-deprecated 2025-06-01 Use PATCH /users/{user}/deactivate instead
+     */
+    public function destroy(User $user)
+    {
+        // ...
+    }
 }
 ```
+
+### Available Annotations
+
+| Annotation | Level | Description |
+|------------|-------|-------------|
+| `@api-lens-group Name` | Class | Group endpoints under a section |
+| `@api-lens-auth bearer\|basic\|api-key` | Class/Method | Authentication type |
+| `@api-lens-tag name` | Method | Custom tag |
+| `@api-lens-response {code} {json?}` | Method | Response code with optional JSON example |
+| `@api-lens-deprecated {date} {message}` | Method | Mark as deprecated with migration info |
 
 ## OpenAPI Export
 
@@ -137,13 +159,16 @@ public function store(StoreUserRequest $request)
 
 ```bash
 # Export as OpenAPI 3.1.0 JSON
-php artisan api-lens:export --format=openapi --output=docs/openapi.json
+php artisan api-lens:export docs/openapi.json --format=openapi
 
 # Export as Postman Collection
-php artisan api-lens:export --format=postman --output=docs/postman.json
+php artisan api-lens:export docs/postman.json --format=postman
 
-# Print to stdout
-php artisan api-lens:export --format=openapi
+# Default export (api.json in project root)
+php artisan api-lens:export
+
+# Overwrite without confirmation
+php artisan api-lens:export docs/openapi.json --format=openapi --force
 ```
 
 ### Via API
