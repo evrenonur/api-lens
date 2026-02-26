@@ -26,6 +26,24 @@ Zero config. Real-time testing. Modern Vue 3 UI. OpenAPI export.
 - **Keyboard Shortcuts** — `Ctrl+K` search, arrow navigation, Enter to select
 - **Debug Metrics** — SQL query count/time, memory usage, execution time per request
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/1.png" alt="API Lens - Endpoint List" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/2.png" alt="API Lens - Endpoint Detail" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/3.png" alt="API Lens - Live Testing" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/4.png" alt="API Lens - Response & Metrics" width="100%">
+</p>
+
 ## Requirements
 
 - PHP 8.1+
