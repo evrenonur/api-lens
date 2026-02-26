@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0](https://github.com/evrenonur/api-lens/compare/v1.1.2...v1.2.0) (2026-02-26)
+
+### 🚀 New Features
+
+* **ui:** show version badge and update notification in TopNav ([91cbc1d](https://github.com/evrenonur/api-lens/commit/91cbc1d07b3376f21c5dd77e0d41254af6a31fa8))
+
 ## [1.1.2](https://github.com/evrenonur/api-lens/compare/v1.1.1...v1.1.2) (2026-02-26)
 
 ### 🐛 Bug Fixes
