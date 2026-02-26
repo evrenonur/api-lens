@@ -83,6 +83,7 @@ class ApiLensController extends Controller
     {
         return response()->json([
             'title'           => config('api-lens.title', 'API Lens'),
+            'version'         => $this->getInstalledVersion(),
             'default_headers' => config('api-lens.default_headers', []),
             'code_snippets'   => config('api-lens.code_snippets', ['curl', 'javascript', 'php', 'python']),
             'features'        => [
@@ -221,6 +222,74 @@ class ApiLensController extends Controller
         $collection['item'] = array_values($groups);
 
         return $collection;
+    }
+
+    /**
+     * Check for package updates via Packagist.
+     */
+    public function checkUpdate(): JsonResponse
+    {
+        $currentVersion = $this->getInstalledVersion();
+
+        try {
+            $response = file_get_contents(
+                'https://repo.packagist.org/p2/api-lens/api-lens.json',
+                false,
+                stream_context_create([
+                    'http' => [
+                        'timeout' => 5,
+                        'header' => "User-Agent: ApiLens/{$currentVersion}\r\n",
+                    ],
+                ])
+            );
+
+            if ($response === false) {
+                return response()->json([
+                    'current_version' => $currentVersion,
+                    'latest_version'  => null,
+                    'update_available' => false,
+                    'error' => 'Could not reach Packagist',
+                ]);
+            }
+
+            $data = json_decode($response, true);
+            $packages = $data['packages']['api-lens/api-lens'] ?? [];
+
+            // Find latest stable version
+            $latestVersion = $currentVersion;
+            foreach ($packages as $pkg) {
+                $v = ltrim($pkg['version'] ?? '', 'v');
+                if (preg_match('/^\d+\.\d+\.\d+$/', $v) && version_compare($v, $latestVersion, '>')) {
+                    $latestVersion = $v;
+                }
+            }
+
+            return response()->json([
+                'current_version'  => $currentVersion,
+                'latest_version'   => $latestVersion,
+                'update_available' => version_compare($latestVersion, $currentVersion, '>'),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'current_version'  => $currentVersion,
+                'latest_version'   => null,
+                'update_available' => false,
+                'error' => 'Update check failed',
+            ]);
+        }
+    }
+
+    /**
+     * Get the installed package version from composer.json.
+     */
+    private function getInstalledVersion(): string
+    {
+        $composerJson = __DIR__ . '/../../composer.json';
+        if (file_exists($composerJson)) {
+            $data = json_decode(file_get_contents($composerJson), true);
+            return $data['version'] ?? '0.0.0';
+        }
+        return '0.0.0';
     }
 
     /**

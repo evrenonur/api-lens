@@ -42,9 +42,17 @@ export interface RateLimit {
 
 export interface ApiLensConfig {
   title: string
+  version: string
   default_headers: HeaderItem[]
   code_snippets: string[]
   features: FeatureFlags
+}
+
+export interface UpdateInfo {
+  current_version: string
+  latest_version: string | null
+  update_available: boolean
+  error?: string
 }
 
 export interface FeatureFlags {

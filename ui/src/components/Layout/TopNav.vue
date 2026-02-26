@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useEndpointStore } from '@/stores/endpoints'
 import type { ThemeMode } from '@/types'
 
@@ -14,18 +14,44 @@ const emit = defineEmits<{
 const store = useEndpointStore()
 
 const exportOpen = ref(false)
+const updateDismissed = ref(false)
+
+const currentVersion = computed(() => store.config?.version || '...')
+const updateAvailable = computed(() => store.updateInfo?.update_available === true && !updateDismissed.value)
+const latestVersion = computed(() => store.updateInfo?.latest_version || '')
 
 function closeExport() {
   exportOpen.value = false
 }
 
 function exportAs(format: 'openapi' | 'postman') {
-  // apiUrl is like '/api-lens/api', we need '/api-lens'
   const apiUrl = window.__API_LENS_CONFIG__?.apiUrl || '/api-lens/api'
   const baseUrl = apiUrl.replace(/\/api$/, '')
   window.open(`${baseUrl}/export/${format}`, '_blank')
   exportOpen.value = false
 }
+
+function dismissUpdate() {
+  updateDismissed.value = true
+  try {
+    localStorage.setItem('api-lens-update-dismissed', latestVersion.value)
+  } catch { /* ignore */ }
+}
+
+onMounted(() => {
+  // Check for updates after a short delay to not block UI
+  setTimeout(() => {
+    store.checkForUpdate().then(() => {
+      // If user already dismissed this version, don't show again
+      try {
+        const dismissed = localStorage.getItem('api-lens-update-dismissed')
+        if (dismissed === latestVersion.value) {
+          updateDismissed.value = true
+        }
+      } catch { /* ignore */ }
+    })
+  }, 2000)
+})
 </script>
 
 <template>
@@ -48,6 +74,10 @@ function exportAs(format: 'openapi' | 'postman') {
       <div class="hidden sm:flex items-center gap-2 ml-4 pl-4 border-l border-gray-200 dark:border-gray-800">
         <span class="text-xs text-gray-500 dark:text-gray-400">
           {{ store.stats.filtered }} / {{ store.stats.total }} endpoints
+        </span>
+        <!-- Version Badge -->
+        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+          v{{ currentVersion }}
         </span>
       </div>
     </div>
@@ -165,4 +195,54 @@ function exportAs(format: 'openapi' | 'postman') {
       </button>
     </div>
   </header>
+
+  <!-- Update Available Banner -->
+  <Transition
+    enter-active-class="transition ease-out duration-300"
+    enter-from-class="transform -translate-y-full opacity-0"
+    enter-to-class="transform translate-y-0 opacity-100"
+    leave-active-class="transition ease-in duration-200"
+    leave-from-class="transform translate-y-0 opacity-100"
+    leave-to-class="transform -translate-y-full opacity-0"
+  >
+    <div
+      v-if="updateAvailable"
+      class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 flex items-center justify-between text-sm"
+    >
+      <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+        </svg>
+        <span>
+          A new version of API Lens is available!
+          <span class="font-mono font-bold ml-1">v{{ currentVersion }}</span>
+          <svg class="w-3 h-3 inline mx-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+          <span class="font-mono font-bold">v{{ latestVersion }}</span>
+        </span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a
+          href="https://github.com/evrenonur/api-lens/releases"
+          target="_blank"
+          class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors font-medium"
+        >
+          View Release
+        </a>
+        <code class="hidden md:inline text-[11px] bg-white/10 px-2 py-0.5 rounded font-mono">
+          composer update api-lens/api-lens
+        </code>
+        <button
+          @click="dismissUpdate"
+          class="text-white/70 hover:text-white transition-colors ml-1"
+          title="Dismiss"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </Transition>
 </template>

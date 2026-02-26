@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Endpoint, GroupBy, SortBy, HistoryEntry, ApiLensConfig } from '@/types'
+import type { Endpoint, GroupBy, SortBy, HistoryEntry, ApiLensConfig, UpdateInfo } from '@/types'
 import Fuse from 'fuse.js'
 
 export const useEndpointStore = defineStore('endpoints', () => {
@@ -9,6 +9,7 @@ export const useEndpointStore = defineStore('endpoints', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const config = ref<ApiLensConfig | null>(null)
+  const updateInfo = ref<UpdateInfo | null>(null)
 
   // Filters
   const searchQuery = ref('')
@@ -139,6 +140,17 @@ export const useEndpointStore = defineStore('endpoints', () => {
     }
   }
 
+  async function checkForUpdate() {
+    try {
+      const apiUrl = window.__API_LENS_CONFIG__?.apiUrl || '/api-lens/api'
+      const baseUrl = apiUrl.replace(/\/api$/, '')
+      const response = await fetch(`${baseUrl}/check-update`)
+      updateInfo.value = await response.json()
+    } catch (err) {
+      console.error('[API Lens] Update check error:', err)
+    }
+  }
+
   function selectEndpoint(endpoint: Endpoint | null) {
     selectedEndpoint.value = endpoint
   }
@@ -181,6 +193,7 @@ export const useEndpointStore = defineStore('endpoints', () => {
     loading,
     error,
     config,
+    updateInfo,
     searchQuery,
     selectedMethods,
     selectedGroup,
@@ -199,6 +212,7 @@ export const useEndpointStore = defineStore('endpoints', () => {
     // Actions
     fetchEndpoints,
     fetchConfig,
+    checkForUpdate,
     selectEndpoint,
     toggleMethod,
     addToHistory,
