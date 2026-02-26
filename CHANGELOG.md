@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.0](https://github.com/evrenonur/api-lens/compare/v1.0.0...v1.1.0) (2026-02-26)
+
+### 🚀 New Features
+
+* **ui:** add export dropdown buttons for OpenAPI and Postman ([8aa6480](https://github.com/evrenonur/api-lens/commit/8aa64801a4b95e52ae6a33c7ed5ac0f8eeef70d8))
+
+### 🐛 Bug Fixes
+
+* **test:** add placeholder Feature test to prevent PHPUnit directory error ([569815d](https://github.com/evrenonur/api-lens/commit/569815d533ef6b96a9d7e481886cae60f71f2cd3))
+
 All notable changes to this project will be documented in this file.
 
 This project follows [Conventional Commits](https://www.conventionalcommits.org/)
