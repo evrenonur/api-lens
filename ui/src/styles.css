@@ -1,0 +1,167 @@
+@import 'highlight.js/styles/github.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  }
+
+  ::selection {
+    @apply bg-primary-500/20 text-primary-700 dark:text-primary-300;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
+           focus:ring-primary-500 dark:focus:ring-offset-gray-900;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
+  }
+
+  .btn-ghost {
+    @apply btn text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700
+           bg-white dark:bg-gray-900 text-sm
+           placeholder:text-gray-400 dark:placeholder:text-gray-600
+           focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500
+           transition-colors duration-200;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+           border transition-colors duration-200;
+  }
+
+  .method-badge {
+    @apply px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider min-w-[4.5rem] text-center;
+  }
+
+  .tab {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+           text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800;
+  }
+
+  .tab-active {
+    @apply tab bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300;
+  }
+
+  .code-block {
+    @apply bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 rounded-lg p-4 overflow-x-auto
+           font-mono text-sm leading-relaxed border border-gray-200 dark:border-gray-800;
+  }
+
+  /* Dark mode: override hljs github (light) theme to github-dark colors */
+  .dark pre code.hljs,
+  .dark pre .hljs {
+    color: #e6edf3;
+    background: transparent;
+  }
+
+  .dark pre .hljs-keyword { color: #ff7b72; }
+  .dark pre .hljs-string { color: #a5d6ff; }
+  .dark pre .hljs-title { color: #d2a8ff; }
+  .dark pre .hljs-built_in { color: #ffa657; }
+  .dark pre .hljs-comment { color: #8b949e; }
+  .dark pre .hljs-number { color: #79c0ff; }
+  .dark pre .hljs-attr { color: #79c0ff; }
+  .dark pre .hljs-variable { color: #ffa657; }
+  .dark pre .hljs-literal { color: #79c0ff; }
+  .dark pre .hljs-type { color: #ff7b72; }
+  .dark pre .hljs-params { color: #e6edf3; }
+  .dark pre .hljs-meta { color: #79c0ff; }
+  .dark pre .hljs-symbol { color: #79c0ff; }
+
+  /* Animations */
+  .slide-in {
+    animation: slideIn 0.2s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.15s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* JSON Editor overlay styles */
+  .json-editor-wrapper {
+    min-height: 240px;
+  }
+
+  .json-editor-highlight {
+    min-height: 240px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .json-editor-highlight code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  .json-editor-textarea {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .json-editor-textarea::selection {
+    -webkit-text-fill-color: transparent;
+    background: rgba(59, 130, 246, 0.3);
+  }
+}

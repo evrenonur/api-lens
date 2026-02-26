@@ -1,0 +1,54 @@
+{
+    "name": "api-lens/api-lens",
+    "version": "1.0.0",
+    "description": "Auto-generated, interactive API documentation for Laravel with a modern Vue 3 UI. Zero config, real-time testing, code snippets, OpenAPI export.",
+    "keywords": ["laravel", "api", "documentation", "openapi", "swagger", "auto-documentation", "vue3"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Onur Evren",
+            "email": "onur.evren.1999@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/routing": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.27",
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "phpunit/phpunit": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiLens\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ApiLens\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ApiLens\\ApiLensServiceProvider"
+            ],
+            "aliases": {
+                "ApiLens": "ApiLens\\ApiLensFacade"
+            }
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "lint": "vendor/bin/pint",
+        "lint-test": "vendor/bin/pint --test"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
