@@ -1,6 +1,6 @@
 {
     "name": "evrenonur/api-lens",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "description": "Auto-generated, interactive API documentation for Laravel with a modern Vue 3 UI. Zero config, real-time testing, code snippets, OpenAPI export.",
     "keywords": ["laravel", "api", "documentation", "openapi", "swagger", "auto-documentation", "vue3"],
     "license": "MIT",

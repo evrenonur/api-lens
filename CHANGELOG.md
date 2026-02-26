@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.0](https://github.com/evrenonur/api-lens/compare/v1.3.1...v1.4.0) (2026-02-26)
+
+### 🚀 New Features
+
+* persist request & response data across sessions with smart body merge ([032e293](https://github.com/evrenonur/api-lens/commit/032e2931456b2a57fae44c8ca4e45366fc235e86))
+
 ## [1.3.1](https://github.com/evrenonur/api-lens/compare/v1.3.0...v1.3.1) (2026-02-26)
 
 ### 🐛 Bug Fixes
