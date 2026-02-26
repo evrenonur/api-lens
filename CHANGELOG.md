@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2](https://github.com/evrenonur/api-lens/compare/v1.1.1...v1.1.2) (2026-02-26)
+
+### 🐛 Bug Fixes
+
+* use __DIR__ based asset path for portable installation ([b77bd49](https://github.com/evrenonur/api-lens/commit/b77bd492987f459a953896734df461d20cc9938c))
+
 ## [1.1.1](https://github.com/evrenonur/api-lens/compare/v1.1.0...v1.1.1) (2026-02-26)
 
 ### 🐛 Bug Fixes
