@@ -15,6 +15,7 @@ export const useEndpointStore = defineStore('endpoints', () => {
   const searchQuery = ref('')
   const selectedMethods = ref<Set<string>>(new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']))
   const selectedGroup = ref<string | null>(null)
+  const selectedControllers = ref<Set<string>>(new Set())
   const sortBy = ref<SortBy>('default')
   const groupBy = ref<GroupBy>('api_uri')
 
@@ -45,6 +46,14 @@ export const useEndpointStore = defineStore('endpoints', () => {
     // Filter by HTTP method
     result = result.filter(e => selectedMethods.value.has(e.http_method))
 
+    // Filter by controller
+    if (selectedControllers.value.size > 0) {
+      result = result.filter(e => {
+        const ctrl = e.controller || 'Unknown'
+        return selectedControllers.value.has(ctrl)
+      })
+    }
+
     // Filter by group
     if (selectedGroup.value) {
       result = result.filter(e => e.group === selectedGroup.value)
@@ -58,6 +67,15 @@ export const useEndpointStore = defineStore('endpoints', () => {
     }
 
     return result
+  })
+
+  // Computed - unique controllers
+  const uniqueControllers = computed(() => {
+    const controllerSet = new Set<string>()
+    endpoints.value.forEach(e => {
+      controllerSet.add(e.controller || 'Unknown')
+    })
+    return Array.from(controllerSet).sort()
   })
 
   // Computed - unique groups
@@ -164,6 +182,19 @@ export const useEndpointStore = defineStore('endpoints', () => {
     selectedMethods.value = new Set(selectedMethods.value)
   }
 
+  function toggleController(controller: string) {
+    if (selectedControllers.value.has(controller)) {
+      selectedControllers.value.delete(controller)
+    } else {
+      selectedControllers.value.add(controller)
+    }
+    selectedControllers.value = new Set(selectedControllers.value)
+  }
+
+  function clearControllerFilter() {
+    selectedControllers.value = new Set()
+  }
+
   function addToHistory(entry: HistoryEntry) {
     history.value.unshift(entry)
     if (history.value.length > 50) {
@@ -197,6 +228,7 @@ export const useEndpointStore = defineStore('endpoints', () => {
     searchQuery,
     selectedMethods,
     selectedGroup,
+    selectedControllers,
     sortBy,
     groupBy,
     selectedEndpoint,
@@ -206,6 +238,7 @@ export const useEndpointStore = defineStore('endpoints', () => {
     // Computed
     filteredEndpoints,
     groups,
+    uniqueControllers,
     groupedEndpoints,
     stats,
 
@@ -215,6 +248,8 @@ export const useEndpointStore = defineStore('endpoints', () => {
     checkForUpdate,
     selectEndpoint,
     toggleMethod,
+    toggleController,
+    clearControllerFilter,
     addToHistory,
     loadHistory,
     clearHistory,
