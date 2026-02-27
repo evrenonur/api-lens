@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.0](https://github.com/evrenonur/api-lens/compare/v1.4.0...v1.5.0) (2026-02-27)
+
+### 🚀 New Features
+
+* add controller filter, group name formatting, clear storage button ([bb6e813](https://github.com/evrenonur/api-lens/commit/bb6e8139e973545a5b9a1befc2230b8d492dd3f8))
+
 ## [1.4.0](https://github.com/evrenonur/api-lens/compare/v1.3.1...v1.4.0) (2026-02-26)
 
 ### 🚀 New Features
